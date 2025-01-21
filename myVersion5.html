@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <pre>
+            <!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas Circle Drawing</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+        }
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-xs-2 col-md-3 col-lg-4 mb-3">
+                <input type="number" id="canvasSize" class="form-control" placeholder="Canvas size (5-10)">
+            </div>
+            <div class="col-xs-2 col-md-3 col-lg-4 mb-3">
+                <input type="number" id="circleRadius" class="form-control" placeholder="Circle radius (5-10)">
+            </div>
+            <div class="col-xs-2 col-md-3 col-lg-4 mb-3">
+                <input type="number" id="circleLimit" class="form-control" placeholder="Circle limit (5-10)">
+            </div>
+            <div class="col-xs-7 col-md-3 col-lg-2">
+                <button id="applySettings" class="btn btn-primary w-100">Apply Settings</button>
+            </div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="drawingCanvas" width="500" height="500"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const canvasSizeInput = document.getElementById('canvasSize');
+        const circleRadiusInput = document.getElementById('circleRadius');
+        const circleLimitInput = document.getElementById('circleLimit');
+        const applyButton = document.getElementById('applySettings');
+
+        let circles = [];
+
+        function validateInput(input) {
+            const value = parseInt(input.value);
+            const isValid = !isNaN(value) && value >= 5 && value <= 10;
+            
+            if (isValid) {
+                input.classList.remove('is-invalid');
+            } else {
+                input.classList.add('is-invalid');
+            }
+            
+            return isValid;
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function drawCircle(x, y, radius, color) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = 'blue';
+            ctx.stroke();
+        }
+
+        function redrawAllCircles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            circles.forEach(circle => {
+                drawCircle(circle.x, circle.y, circle.radius, circle.color);
+            });
+        }
+
+        applyButton.addEventListener('click', () => {
+            const sizeValid = validateInput(canvasSizeInput);
+            const radiusValid = validateInput(circleRadiusInput);
+            const limitValid = validateInput(circleLimitInput);
+
+            if (sizeValid && radiusValid && limitValid) {
+                const newSize = parseInt(canvasSizeInput.value) * 100;
+                canvas.width = newSize;
+                canvas.height = newSize;
+                redrawAllCircles();
+            }
+        });
+
+        canvas.addEventListener('click', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const radius = parseInt(circleRadiusInput.value) * 5;
+            const color = getRandomColor();
+
+            circles.push({ x, y, radius, color });
+            
+            const limit = parseInt(circleLimitInput.value);
+            if (circles.length > limit) {
+                circles.shift(); // Remove the oldest circle
+            }
+
+            redrawAllCircles();
+        });
+
+        // Initial validation
+        [canvasSizeInput, circleRadiusInput, circleLimitInput].forEach(input => {
+            input.addEventListener('input', () => validateInput(input));
+        });
+    </script>
+</body>
+</html>
+        </pre>
+    </body>
+</html>

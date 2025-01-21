@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <pre>
+            <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Drawing App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #drawingCanvas {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <!-- On medium screens: 6-2-2-2, On smaller screens: 3-3-3-3 -->
+            <div class="col-3 col-md-6">
+                <input type="number" 
+                       class="form-control" 
+                       id="sizeInput" 
+                       placeholder="Enter positive number"
+                       min="1"
+                       step="1">
+            </div>
+            <div class="col-3 col-md-2">
+                <button class="btn btn-primary w-100" id="squareBtn">Square</button>
+            </div>
+            <div class="col-3 col-md-2">
+                <button class="btn btn-primary w-100" id="circleBtn">Circle</button>
+            </div>
+            <div class="col-3 col-md-2">
+                <button class="btn btn-primary w-100" id="lineBtn">Line</button>
+            </div>
+        </div>
+        <div class="canvas-container">
+            <canvas id="drawingCanvas" width="800" height="800"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const input = document.getElementById('sizeInput');
+        const synth = window.speechSynthesis;
+
+        // Function to clear canvas
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Function to speak message
+        function speak(message) {
+            const utterance = new SpeechSynthesisUtterance(message);
+            synth.speak(utterance);
+        }
+
+        // Function to validate input
+        function validateInput() {
+            const value = parseInt(input.value);
+            if (!value || value <= 0) {
+                speak("Please input value");
+                return null;
+            }
+            return value;
+        }
+
+        // Draw square
+        document.getElementById('squareBtn').addEventListener('click', () => {
+            const size = validateInput();
+            if (size !== null) {
+                speak("I will draw a new square");
+                clearCanvas();
+                
+                // Calculate center position
+                const x = (canvas.width - size) / 2;
+                const y = (canvas.height - size) / 2;
+                
+                ctx.fillStyle = 'green';
+                ctx.fillRect(x, y, size, size);
+            }
+        });
+
+        // Draw circle
+        document.getElementById('circleBtn').addEventListener('click', () => {
+            const radius = validateInput();
+            if (radius !== null) {
+                speak("I will draw a new circle");
+                clearCanvas();
+                
+                // Draw from center
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = 'pink';
+                ctx.fill();
+            }
+        });
+
+        // Draw line
+        document.getElementById('lineBtn').addEventListener('click', () => {
+            const thickness = validateInput();
+            if (thickness !== null) {
+                speak("I will draw a new line");
+                clearCanvas();
+                
+                // Set line properties
+                ctx.beginPath();
+                ctx.setLineDash([5, 5]); // Create dashed line
+                ctx.lineWidth = thickness;
+                ctx.strokeStyle = 'red';
+                
+                // Draw from top-right to bottom-middle
+                ctx.moveTo(canvas.width, 0);
+                ctx.lineTo(canvas.width / 2, canvas.height);
+                
+                ctx.stroke();
+                ctx.setLineDash([]); // Reset dash pattern
+            }
+        });
+    </script>
+</body>
+</html>
+        </pre>
+    </body>
+</html>

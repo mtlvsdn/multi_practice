@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <pre>
+            <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Square</title>
+    <style>
+        body {
+            background-color: #87CEFA;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        canvas {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Square properties
+        const square = {
+            size: 9,
+            x: 0,
+            y: 0,
+            dx: 5, // horizontal speed
+            dy: 5  // vertical speed
+        };
+
+        // Draw the square
+        function drawSquare() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(square.x, square.y, square.size, square.size);
+        }
+
+        // Move the square
+        function moveSquare() {
+            // Update position
+            square.x += square.dx;
+            square.y += square.dy;
+
+            // Check for collision with right wall
+            if (square.x + square.size > canvas.width) {
+                square.x = canvas.width - square.size;
+                square.dx = -square.dx;
+            }
+
+            // Check for collision with left wall
+            if (square.x < 0) {
+                square.x = 0;
+                square.dx = -square.dx;
+            }
+
+            // Check for collision with bottom wall
+            if (square.y + square.size > canvas.height) {
+                square.y = canvas.height - square.size;
+                square.dy = -square.dy;
+            }
+
+            // Check for collision with top wall
+            if (square.y < 0) {
+                square.y = 0;
+                square.dy = -square.dy;
+            }
+
+            drawSquare();
+        }
+
+        // Initial draw
+        drawSquare();
+
+        // Handle keyboard input
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                moveSquare();
+            }
+        });
+    </script>
+</body>
+</html>
+        </pre>
+    </body>
+</html>

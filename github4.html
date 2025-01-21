@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <pre>
+            &lt;!DOCTYPE html&gt;
+&lt;!--
+
+Write a web application that displays an 800x600 canvas, centered horizontally. 
+The background color of the entire page should be #87CEFA. On the canvas, draw a 9x9 blue square 
+in the top-left corner.
+When pressing the Space key, the square should move towards the bottom right, equally distanced. 
+When colliding with a margin of the canvas, the square should change its direction towards the opposite margin.
+
+--&gt;
+&lt;html lang="en"&gt;
+	&lt;head&gt;
+		&lt;meta charset="UTF-8" /&gt;
+		&lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+		&lt;title&gt;Exam&lt;/title&gt;
+		&lt;style&gt;
+			body {
+				background-color: #87cefa;
+				display: flex;
+				justify-content: center;
+				height: 100vh;
+				margin: 0;
+			}
+			canvas {
+				border: 1px solid black;
+				align-self: center;
+			}
+		&lt;/style&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+		&lt;canvas id="canvas" width="800" height="600"&gt;&lt;/canvas&gt;
+		&lt;script&gt;
+			const canvas = document.getElementById('canvas');
+			const ctx = canvas.getContext('2d');
+			let x = 0;
+			let y = 0;
+			let dx = 9;
+			let dy = 9;
+
+			function drawSquare() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				ctx.fillStyle = 'blue';
+				ctx.fillRect(x, y, 9, 9);
+			}
+
+			function updatePosition() {
+				if (x + dx &gt; canvas.width - 9 || x + dx &lt; 0) {
+					dx = -dx;
+				}
+				if (y + dy &gt; canvas.height - 9 || y + dy &lt; 0) {
+					dy = -dy;
+				}
+				x += dx;
+				y += dy;
+				drawSquare();
+			}
+
+			document.addEventListener('keydown', function (e) {
+				if (e.code === 'Space') {
+					updatePosition();
+				}
+			});
+
+			drawSquare();
+		&lt;/script&gt;
+	&lt;/body&gt;
+&lt;/html&gt;
+
+        </pre>
+    </body>
+</html>

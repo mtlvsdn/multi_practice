@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <pre>
+            &lt;!DOCTYPE html&gt;
+&lt;!--
+2p) Write a web application that displays a Leaflet map, two textboxes and a button, using Bootstrap styling. 
+The number of columns for the Bootstrap grid should be defined as follows: 
+Textbox 1: Extra large 4 Medium 3 Small 6, Textbox 2: Extra large 4 Medium 3 Small 3,
+Button Extra large 2 Medium 3 Small 2
+1p) The textboxes should only accept numeric values, the first one between -90 and 90, the second one between
+-180 and 180. When clicking the button, if the value of an input is invalid, add a validation error class on 
+the respective input using Bootstrap.
+1p) If the value inside the input is valid, initialize a Leaflet map and set the view to the coordinates 
+specified by the 2 inputs (input 1 being the latitude and input 2 being the longitude). The zoom level must be 12.
+2p) Upon granted permission, use the geolocation API to determine the location of the user. Draw 2 markers for
+both places (user location and center of the map), adding a popup containing as text the coordinates of the 2 markers. 
+3p) After 5 seconds, set the view of the map to the location of the user. After 5 more seconds set the view to 
+fit both markers. After 5 more seconds draw a purple line between the 2 markers.
+--&gt;
+&lt;html lang=&quot;en&quot;&gt;
+	&lt;head&gt;
+		&lt;meta charset=&quot;UTF-8&quot; /&gt;
+		&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;
+		&lt;title&gt;Exam&lt;/title&gt;
+		&lt;link href=&quot;https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot; /&gt;
+		&lt;link rel=&quot;stylesheet&quot; href=&quot;https://unpkg.com/leaflet@1.7.1/dist/leaflet.css&quot; /&gt;
+		&lt;style&gt;
+			#map {
+				height: 400px;
+			}
+		&lt;/style&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+		&lt;div class=&quot;container&quot;&gt;
+			&lt;div class=&quot;row&quot;&gt;
+				&lt;div class=&quot;col-xl-4 col-md-3 col-sm-6&quot;&gt;
+					&lt;input type=&quot;number&quot; class=&quot;form-control&quot; id=&quot;latitude&quot; placeholder=&quot;Latitude (-90 to 90)&quot; /&gt;
+				&lt;/div&gt;
+				&lt;div class=&quot;col-xl-4 col-md-3 col-sm-3&quot;&gt;
+					&lt;input type=&quot;number&quot; class=&quot;form-control&quot; id=&quot;longitude&quot; placeholder=&quot;Longitude (-180 to 180)&quot; /&gt;
+				&lt;/div&gt;
+				&lt;div class=&quot;col-xl-2 col-md-3 col-sm-2&quot;&gt;
+					&lt;button class=&quot;btn btn-primary&quot; id=&quot;submitBtn&quot;&gt;Show on Map&lt;/button&gt;
+				&lt;/div&gt;
+			&lt;/div&gt;
+			&lt;div id=&quot;map&quot; class=&quot;mt-3&quot;&gt;&lt;/div&gt;
+		&lt;/div&gt;
+
+		&lt;script src=&quot;https://code.jquery.com/jquery-3.3.1.slim.min.js&quot;&gt;&lt;/script&gt;
+		&lt;script src=&quot;https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js&quot;&gt;&lt;/script&gt;
+		&lt;script src=&quot;https://unpkg.com/leaflet@1.7.1/dist/leaflet.js&quot;&gt;&lt;/script&gt;
+		&lt;script&gt;
+			document.getElementById(&#39;submitBtn&#39;).addEventListener(&#39;click&#39;, function () {
+				let latInput = document.getElementById(&#39;latitude&#39;);
+				let lngInput = document.getElementById(&#39;longitude&#39;);
+				let lat = parseFloat(latInput.value);
+				let lng = parseFloat(lngInput.value);
+
+				if (isValidCoordinate(lat, -90, 90) &amp;&amp; isValidCoordinate(lng, -180, 180)) {
+					initializeMap(lat, lng);
+				} else {
+					if (!isValidCoordinate(lat, -90, 90)) {
+						latInput.classList.add(&#39;is-invalid&#39;);
+					} else {
+						latInput.classList.remove(&#39;is-invalid&#39;);
+					}
+					if (!isValidCoordinate(lng, -180, 180)) {
+						lngInput.classList.add(&#39;is-invalid&#39;);
+					} else {
+						lngInput.classList.remove(&#39;is-invalid&#39;);
+					}
+				}
+			});
+
+			function isValidCoordinate(value, min, max) {
+				return !isNaN(value) &amp;&amp; value &gt;= min &amp;&amp; value &lt;= max;
+			}
+
+			let map;
+			let userMarker, inputMarker;
+			let userLocation, inputLocation;
+
+			function initializeMap(lat, lng) {
+				map = L.map(&#39;map&#39;).setView([lat, lng], 12);
+				L.tileLayer(&#39;https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png&#39;, {
+					attribution: &#39;© OpenStreetMap contributors&#39;,
+				}).addTo(map);
+
+				inputLocation = L.latLng(lat, lng);
+				inputMarker = L.marker(inputLocation)
+					.addTo(map)
+					.bindPopup(&#39;Input Location: &#39; + inputLocation.toString())
+					.openPopup();
+
+				if (navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function (position) {
+						userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
+						userMarker = L.marker(userLocation)
+							.addTo(map)
+							.bindPopup(&#39;Your Location: &#39; + userLocation.toString());
+
+						setTimeout(function () {
+							map.setView(userLocation, 12);
+						}, 5000);
+
+						setTimeout(function () {
+							map.fitBounds([inputLocation, userLocation]);
+						}, 10000);
+
+						setTimeout(function () {
+							drawLineBetweenMarkers();
+						}, 15000);
+					});
+				}
+			}
+
+			function drawLineBetweenMarkers() {
+				let latlngs = [inputLocation, userLocation];
+				let polyline = L.polyline(latlngs, { color: &#39;purple&#39; }).addTo(map);
+			}
+		&lt;/script&gt;
+	&lt;/body&gt;
+&lt;/html&gt;
+
+        </pre>
+    </body>
+</html>

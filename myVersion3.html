@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <pre>
+            <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Sound Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <!-- On large screens: 9-3 columns, On smaller screens: 6-6 columns -->
+            <div class="col-6 col-lg-9">
+                <input type="text" 
+                       class="form-control" 
+                       id="textInput" 
+                       placeholder="Enter text">
+            </div>
+            <div class="col-6 col-lg-3">
+                <button class="btn btn-primary w-100" id="playBtn">Play Sound</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Audio Context
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Function to play tone for a single character
+        function playTone(frequency, duration) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = frequency;
+            
+            // Start the sound
+            oscillator.start();
+            
+            // Stop after duration
+            setTimeout(() => {
+                oscillator.stop();
+            }, duration);
+        }
+        
+        // Function to play sounds for entire text
+        async function playSoundsForText(text) {
+            for (let i = 0; i < text.length; i++) {
+                // Get ASCII code and double it for frequency
+                const frequency = text.charCodeAt(i) * 2;
+                
+                // Play tone for 500ms (half a second)
+                playTone(frequency, 500);
+                
+                // Wait 500ms before playing next character
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+        
+        // Add click event listener to button
+        document.getElementById('playBtn').addEventListener('click', () => {
+            const text = document.getElementById('textInput').value;
+            if (text) {
+                playSoundsForText(text);
+            }
+        });
+    </script>
+</body>
+</html>
+        </pre>
+    </body>
+</html>

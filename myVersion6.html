@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <pre>
+            <!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Map Navigation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" rel="stylesheet">
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-sm-6 col-md-3 col-xl-4 mb-3">
+                <input type="number" id="latitude" class="form-control" placeholder="Latitude (-90 to 90)">
+            </div>
+            <div class="col-sm-3 col-md-3 col-xl-4 mb-3">
+                <input type="number" id="longitude" class="form-control" placeholder="Longitude (-180 to 180)">
+            </div>
+            <div class="col-sm-2 col-md-3 col-xl-2">
+                <button id="initMap" class="btn btn-primary w-100">Initialize Map</button>
+            </div>
+        </div>
+        
+        <div id="map"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script>
+        let map = null;
+        let markers = [];
+        let userMarker = null;
+        let targetMarker = null;
+        
+        const latInput = document.getElementById('latitude');
+        const longInput = document.getElementById('longitude');
+        const initButton = document.getElementById('initMap');
+
+        function validateLatitude(input) {
+            const value = parseFloat(input.value);
+            const isValid = !isNaN(value) && value >= -90 && value <= 90;
+            
+            if (isValid) {
+                input.classList.remove('is-invalid');
+            } else {
+                input.classList.add('is-invalid');
+            }
+            
+            return isValid;
+        }
+
+        function validateLongitude(input) {
+            const value = parseFloat(input.value);
+            const isValid = !isNaN(value) && value >= -180 && value <= 180;
+            
+            if (isValid) {
+                input.classList.remove('is-invalid');
+            } else {
+                input.classList.add('is-invalid');
+            }
+            
+            return isValid;
+        }
+
+        function initializeMap(lat, lng) {
+            if (map) {
+                map.remove();
+            }
+            
+            map = L.map('map').setView([lat, lng], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add marker for target location
+            targetMarker = L.marker([lat, lng])
+                .bindPopup(`Target Location<br>Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`)
+                .addTo(map);
+
+            // Get user's location
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    
+                    // Add marker for user location
+                    userMarker = L.marker([userLat, userLng])
+                        .bindPopup(`Your Location<br>Lat: ${userLat.toFixed(4)}, Lng: ${userLng.toFixed(4)}`)
+                        .addTo(map);
+
+                    // Sequence of view changes and line drawing
+                    setTimeout(() => {
+                        map.setView([userLat, userLng], 12);
+                    }, 5000);
+
+                    setTimeout(() => {
+                        const bounds = L.latLngBounds([
+                            [userLat, userLng],
+                            [lat, lng]
+                        ]);
+                        map.fitBounds(bounds);
+                    }, 10000);
+
+                    setTimeout(() => {
+                        const line = L.polyline([
+                            [userLat, userLng],
+                            [lat, lng]
+                        ], {
+                            color: 'purple'
+                        }).addTo(map);
+                    }, 15000);
+                });
+            }
+        }
+
+        initButton.addEventListener('click', () => {
+            const latValid = validateLatitude(latInput);
+            const longValid = validateLongitude(longInput);
+
+            if (latValid && longValid) {
+                const lat = parseFloat(latInput.value);
+                const lng = parseFloat(longInput.value);
+                initializeMap(lat, lng);
+            }
+        });
+
+        // Initial validation
+        latInput.addEventListener('input', () => validateLatitude(latInput));
+        longInput.addEventListener('input', () => validateLongitude(longInput));
+    </script>
+</body>
+</html>
+        </pre>
+    </body>
+</html>
